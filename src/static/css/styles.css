@@ -1,0 +1,14 @@
+.banner {
+    background: no-repeat center fixed url(https://newrelic.com/sites/default/files/2021-04/good-programmer-banner-final.jpg);
+    background-size: 100vw;
+    position: relative;
+    display: flex;
+    height: 600px;
+    justify-content: center;
+    align-items: center;
+}
+
+.icons {
+    padding-top: 8%;
+    padding-right: 10%;
+}

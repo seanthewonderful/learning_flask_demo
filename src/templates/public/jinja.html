@@ -1,0 +1,19 @@
+{% extends "public/templates/base_public.html" %}
+
+{% block title %}Jinja Page{% endblock %}
+
+{% block main %} 
+
+<div class="container p-4 text-white">
+    <div class="row p-4">
+        <h4>Template Filters</h4>
+        <hr>
+        <p>{{ friends|length }}</p>
+        <p>{{ friends|join("~") }}
+        <p>{{ name|reverse }}</p>
+        <p>{{ name|upper }}</p>
+    </div>
+</div>
+
+
+{% endblock %}
