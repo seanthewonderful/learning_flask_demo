@@ -1,5 +1,7 @@
 {% extends "public/templates/base_public.html" %}
 
+{% import "macros/macros.html" as mac %}
+
 {% block title %}Jinja Page{% endblock %}
 
 {% block main %} 
@@ -12,6 +14,28 @@
         <p>{{ friends|join("~") }}
         <p>{{ name|reverse }}</p>
         <p>{{ name|upper }}</p>
+    </div>
+    <div class="row p-4">
+        <h4>Custom Filters</h4>
+        <hr>
+        <p>{{ date }}</p>
+        <p>{{ date|clean_date }}</p>
+    </div>
+    <div class="row p-4">
+        <h4>Escaping</h4>
+        <hr>
+        <p>{{ my_html }}</p>
+        <p>{{ my_html|safe }}</p>
+        <!-- <p>{{ suspicious|safe }}</p> -->
+    </div>
+    <div class="row p-4">
+        <h4>Macros</h4>
+        <hr>
+        {{ mac.input(label="Your Name", name="name", id="name", placeholder="Please enter your name")}}
+
+        {{ mac.input(label="Age", type="number", name="age", id="age", placeholder="Please enter your age")}}
+
+        {{ mac.input(label="Password", type="password", name="password", id="password", placeholder="Please enter your password")}}
     </div>
 </div>
 
