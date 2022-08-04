@@ -1,7 +1,9 @@
 from src import app
-from flask import render_template, request, jsonify, make_response
+from flask import render_template, redirect, request, jsonify, make_response, send_from_directory, abort
 from datetime import datetime
 from src.template_filters import clean_date
+import os
+from werkzeug.utils import secure_filename
 
 
 @app.route("/")
@@ -79,6 +81,77 @@ def query():
     else:
         
         return "No query received", 200
+
+
+def allowed_image(filename):
+    if not "." in filename:
+        return False
     
+    ext = filename.rsplit(".", 1)[1]
+    
+    if ext.upper() in app.config["ALLOWED_IMAGE_EXTENSIONS"]:
+        return True
+    else:
+        return False
+    
+def allowed_image_filesize(filesize):
+    if int(filesize) > app.config["MAX_IMG_FILESIZE"]:
+        return True
+    else:
+        return False
 
 
+@app.route("/upload-image", methods=["GET", "POST"])
+def upload_image():
+    
+    if request.method == "POST":
+        
+        if request.files:
+            
+            if allowed_image_filesize(request.cookies.get("filesize")):
+                print("File exceeded maximum size")
+                return redirect(request.url)
+            
+            image = request.files["image"]
+            # print(request.cookies)
+            
+            if image.filename == "":
+                print("image must have a filename")
+                return redirect(request.url)
+            
+            if not allowed_image(image.filename):
+                print("That image extension isn't allowed")
+                return redirect(request.url)
+            else:
+                filename = secure_filename(image.filename)
+                image.save(os.path.join(app.config["IMAGE_UPLOADS"], filename))
+            
+            print("image saved")
+            
+            return redirect(request.url)
+    
+    return render_template("public/upload_image.html")
+
+
+@app.route("/get-image/<image_name>")
+def get_image(image_name):
+    try:
+        return send_from_directory(app.config["CLIENT_IMAGES"], path=image_name, as_attachment=False)
+    except FileNotFoundError:
+        abort(404)
+        
+
+@app.route("/get-csv/<filename>")
+def get_csv(filename):
+    try:
+        return send_from_directory(app.config["CLIENT_CSV"], path=filename, as_attachment=True)
+    except FileNotFoundError:
+        abort(404)
+        
+        
+@app.route("/get-report/<path:path>")
+def get_report(path):
+    try:
+        return send_from_directory(app.config["CLIENT_REPORT"], path=filenpathame, as_attachment=True)
+    except FileNotFoundError:
+        abort(404)
