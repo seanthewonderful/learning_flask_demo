@@ -1,5 +1,7 @@
 from src import app
-from flask import render_template, redirect, request, jsonify, make_response, send_from_directory, abort
+from flask import (render_template, redirect, request, 
+                   jsonify, make_response, send_from_directory, abort,
+                   make_response)
 from datetime import datetime
 from src.template_filters import clean_date
 import os
@@ -152,6 +154,38 @@ def get_csv(filename):
 @app.route("/get-report/<path:path>")
 def get_report(path):
     try:
-        return send_from_directory(app.config["CLIENT_REPORT"], path=filenpathame, as_attachment=True)
+        return send_from_directory(app.config["CLIENT_REPORT"], path=path, as_attachment=True)
     except FileNotFoundError:
         abort(404)
+
+
+@app.route("/cookies")
+def cookies():
+    
+    res = make_response("Cookies", 200)
+    
+    cookies = request.cookies
+    
+    flavor = cookies.get("flavor")
+    sugar_type = cookies.get("sugar type")
+    chewy = cookies.get("chewy")
+    
+    print(flavor, sugar_type, chewy)
+    
+    res.set_cookie(
+        key="flavor", 
+        value="chocorate chip",
+        max_age=10,
+        expires=None,
+        path=request.path,
+        domain=None,
+        secure=True,
+        httponly=False
+        )
+    res.set_cookie(
+        "sugar type", 
+        "brown"
+    )
+    res.set_cookie("chewy", "yes")
+    
+    return res
