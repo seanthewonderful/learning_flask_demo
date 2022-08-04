@@ -6,6 +6,7 @@ from src.template_filters import clean_date
 
 @app.route("/")
 def index():
+    print(f"FLASK_ENV set to: {app.config['ENV']}")
     return render_template("public/index.html")
 
 @app.route("/about")
@@ -47,3 +48,37 @@ def json():
         }
         res = make_response(jsonify(n_response), 400)
         return res
+    
+@app.route("/guestbook")
+def guestbook():
+    return render_template("public/guestbook.html")
+
+@app.route("/guestbook/create-entry", methods=["POST"])
+def create_entry():
+    
+    req = request.get_json()
+    
+    print(req)
+    
+    res = make_response(jsonify(req), 200)
+    
+    return res
+
+@app.route("/query")
+def query():
+    # query_string = "?foo=foo&bar=bar&baz=baz&title=query+strings+with+flask"
+    
+    if request.args:
+        args = request.args
+        # for k, v in args.items():
+        #     print(f"{k}: {v}")
+        
+        serialized = ", ".join(f"{k}: {v}" for k, v in args.items())
+        
+        return f"(Query) {serialized}", 200
+    else:
+        
+        return "No query received", 200
+    
+
+
