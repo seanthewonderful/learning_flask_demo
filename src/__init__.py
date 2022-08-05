@@ -11,3 +11,4 @@ else:
 
 from src import views
 from src import views_admin
+from src import error_handlers
