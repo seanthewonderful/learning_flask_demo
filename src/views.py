@@ -1,7 +1,7 @@
 from src import app
 from flask import (render_template, redirect, request, 
                    jsonify, make_response, send_from_directory, abort,
-                   make_response)
+                   make_response, session, url_for)
 from datetime import datetime
 from src.template_filters import clean_date
 import os
@@ -189,3 +189,68 @@ def cookies():
     res.set_cookie("chewy", "yes")
     
     return res
+
+
+users = {
+    "sean": {
+        "username": "sean",
+        "email": "s@s.com",
+        "password": "asdf",
+        "bio": "Famous man who likes the finer things"
+    },
+    "natalie": {
+        "username": "natalie",
+        "email": "n@n.com",
+        "password": "asdf",
+        "bio": "Infamous female who likes the worser things"
+    }
+}
+
+@app.route("/sign-in", methods=["GET", "POST"])
+def sign_in():
+    
+    if request.method == "POST":
+        
+        req = request.form
+        username = req.get("username")
+        password = req.get("password")
+        
+        if not username in users:
+            print("username not found")
+            return redirect(request.url)
+        else:
+            user = users[username]
+            
+        if not password == user["password"]:
+            print("password incorrect")
+            return redirect(request.url)
+        else:
+            # Create a session key. Sessions are kinda like dictionaries
+            # This is insecure... duh
+            session["USERNAME"] = user["username"]
+            session["PASSWORD"] = user["password"]
+            print("user added to session")
+            return redirect(url_for("profile"))
+    
+    return render_template("public/sign_in.html")
+
+
+@app.route("/profile")
+def profile():
+    
+    if session.get("USERNAME", None) is not None:
+        username = session.get("USERNAME")
+        user = users[username]
+        
+        return render_template("public/profile.html", user=user)
+    else:
+        print("username not found in session")
+        return redirect(url_for('sign-in'))
+    
+
+@app.route("/sign-out")
+def sign_out():
+    
+    session.pop("USERNAME", None)
+    
+    return redirect(url_for("sign-in"))
