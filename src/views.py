@@ -438,7 +438,7 @@ def delete_collection(collection):
 
 # DELETE an item
 @app.route("/stock/<collection>/<item>", methods=["DELETE"])
-def delete_collection(collection, item):
+def delete_item(collection, item):
     
     """ If collection and item exist, delete item """
     
@@ -453,3 +453,47 @@ def delete_collection(collection, item):
     
     res = make_response(jsonify({"error": "collection not found"}), 400)
     return res
+
+
+""" Task queues with Flask and Redis """
+
+import redis
+from rq import Queue
+import time
+
+r = redis.Redis()
+q = Queue(connection=r)
+
+# I installed Redis without homebrew, now it is working fine. 
+# CLI command: redis-server = starts Redis terminal. commands below in different terminal
+# CLI command: rq worker = starts Redis listening terminal for this command
+# ^^ rq is a Redis thing, not referring to variables.
+
+def background_task(n):
+    
+    delay = 2
+    
+    print("Task running")
+    print(f"Simulating {delay} second delay")
+    
+    time.sleep(delay)
+    
+    print(len(n))
+    print("Task complete")
+    
+    return len(n)
+
+
+@app.route("/task")
+def add_task():
+    
+    if request.args.get("n"):
+        
+        job = q.enqueue(background_task, request.args.get("n"))
+        
+        q_len = len(q)
+        
+        return f"Task {job.id} added to queue at {job.enqueued_at}. {q_len} tasks in the queue."
+    
+    return "No value for n"
+
