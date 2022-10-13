@@ -202,7 +202,7 @@ users = {
         "username": "natalie",
         "email": "n@n.com",
         "password": "asdf",
-        "bio": "Infamous female who likes the worser things"
+        "bio": "Infamous female who likes the finer things"
     }
 }
 
